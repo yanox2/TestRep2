@@ -1,0 +1,26 @@
+name: Release Test to Production Environment
+on:
+  workflow_dispatch:
+
+jobs:
+  job1:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: get servers
+        uses: sergeysova/jq-action@v2
+        id: servers
+        with:
+          cmd: "curl ${{ secrets.URL_GET_SERVERS }} | jq '.allservers' -r"
+      - name: ssh and deploy
+        uses: appleboy/ssh-action@master # 公開されているアクション {owner}/{repo}@{ref}
+        with: # アクションの入力パラメータを指定
+          host: "${{ steps.servers.outputs.value }}" # サーバリスト
+          username: ${{ secrets.SSH_USERNAME }} # SSH ユーザ名
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 秘密鍵の内容
+          port: ${{ secrets.SSH_PORT }} # ポート番号
+          script: |
+            cd /path/to/git_current
+            git switch main
+            git pull origin main
+            php artisan migrate --force
