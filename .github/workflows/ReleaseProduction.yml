@@ -11,9 +11,9 @@ jobs:
     steps:
       - name: get servers
         uses: sergeysova/jq-action@v2
-       id: servers
-       with:
-         cmd: "curl ${{ secrets.URL_GET_SERVERS }} | jq '.allservers' -r"
+        id: servers
+        with:
+          cmd: "curl ${{ secrets.URL_GET_SERVERS }} | jq '.allservers' -r"
       - name: ssh and deploy
         uses: appleboy/ssh-action@master # 公開されているアクション {owner}/{repo}@{ref}
         with: # アクションの入力パラメータを指定
