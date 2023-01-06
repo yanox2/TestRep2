@@ -1,0 +1,24 @@
+name: Start Maintenance
+on:
+  workflow_dispatch:
+
+jobs:
+  job1:
+    name: Displaying the Maintenance screen
+    runs-on: ubuntu-latest
+    steps:
+      - name: get servers
+        uses: sergeysova/jq-action@v2
+        id: servers
+        with:
+          cmd: "curl ${{ secrets.URL_GET_SERVERS }} | jq '.allservers' -r"
+      - name: maintenance
+        uses: appleboy/ssh-action@master
+        with:
+          host: "${{ steps.servers.outputs.value }}"
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /path/to/git_current
+            php artisan down --message="メンテナンス中です。" --secret="パスワード"

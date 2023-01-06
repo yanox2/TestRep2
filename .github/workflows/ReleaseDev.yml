@@ -1,0 +1,23 @@
+name: Release to Staging Environment
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  job1:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh and deploy
+        uses: appleboy/ssh-action@master # 公開されているアクション {owner}/{repo}@{ref}
+        with: # アクションの入力パラメータを指定
+          host: ${{ secrets.SSH_HOST }} # ホスト名
+          username: ${{ secrets.SSH_USERNAME }} # SSH ユーザ名
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 秘密鍵の内容
+          port: ${{ secrets.SSH_PORT }} # ポート番号
+          script: |
+            cd /path/to/git_current
+            git switch develop
+            git pull origin develop
+            php artisan migrate --force
